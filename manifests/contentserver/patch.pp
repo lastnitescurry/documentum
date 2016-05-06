@@ -10,7 +10,8 @@ class documentum::contentserver::patch() {
   $version    = '7.1'
   
   exec { "csp-installer":
-    command   => "/bin/tar xvf /opt/software/Documentum/D71/Patch27/CS_7.1.0270.0382_linux_ora_P27.tar.gz",
+    command   => "/bin/tar xvf /opt/software/Documentum/D71/Patch19/CS_7.1.0190.0300_linux_ora_P19.tar.gz",
+#    command   => "/bin/tar xvf /opt/software/Documentum/D71/Patch27/CS_7.1.0270.0382_linux_ora_P27.tar.gz",
     cwd       => $installer,
     creates   => "${installer}/patch.bin",
     user      => dmadmin,
