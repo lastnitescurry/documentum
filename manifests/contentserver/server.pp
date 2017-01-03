@@ -14,10 +14,10 @@ class documentum::contentserver::server() {
   $installer  = '/home/dmadmin/sig/cs'
   $documentum = '/u01/app/documentum'
   $port       = '9080'
-  $version    = '7.1'
-  
+  $version    = '7.3'
+
   exec { "cs-installer":
-    command   => "/bin/tar xvf /opt/software/Documentum/D71/Content_Server_7.1_linux64_oracle.tar",
+    command   => "/bin/tar xvf /opt/media/D73/Content_Server_7.3_linux64_oracle.tar",
     cwd       => $installer,
     creates   => "${installer}/serverSetup.bin",
     user      => dmadmin,
@@ -42,4 +42,3 @@ class documentum::contentserver::server() {
     logoutput   => true,
   }
 }
-

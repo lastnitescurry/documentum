@@ -15,7 +15,7 @@ class documentum {
   }
 
   include documentum::contentserver::server
-  include documentum::contentserver::patch
+#  include documentum::contentserver::patch
   include documentum::contentserver::roottask
   include documentum::contentserver::docbroker
   include documentum::contentserver::repository

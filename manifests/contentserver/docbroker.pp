@@ -6,8 +6,8 @@
 class documentum::contentserver::docbroker() {
   $ensure         = file
   $documentum     = '/u01/app/documentum'
-  $version        = '7.1'
-  $installer      = '/u01/app/documentum/product/7.1/install'
+  $version        = '7.3'
+  $installer      = '/u01/app/documentum/product/7.3/install'
   $docbroker_port = 1489
   $docbroker_name = Docbroker
   $docbroker_host = $hostname
@@ -20,7 +20,7 @@ class documentum::contentserver::docbroker() {
     group     => dmadmin,
     content   => template('documentum/docbroker.properties.erb'),
   }
-      
+
   exec { "docbroker-create":
     command     => "${installer}/dm_launch_server_config_program.sh -f /home/dmadmin/sig/docbroker/docbroker.properties -r /home/dmadmin/sig/docbroker/response.properties -i Silent",
     cwd         => $installer,
@@ -41,7 +41,7 @@ class documentum::contentserver::docbroker() {
     timeout     => 3000,
     notify      => [Exec [ "b-install.log"], Exec [ "b-dmadmin.ServerConfigurator.log"]]
   }
-  
+
   exec { "b-install.log":
     command     => "/bin/cat ${installer}/logs/install.log",
     cwd         => $installer,

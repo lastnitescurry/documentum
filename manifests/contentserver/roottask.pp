@@ -14,23 +14,22 @@ class documentum::contentserver::roottask() {
   }
   file { "${documentum}/dba/dm_check_password" :
     ensure => $ensure,
-    source => "${documentum}/product/7.1/install/external_apps/checkpass/dm_check_password",
+    source => "${documentum}/product/7.3/install/external_apps/checkpass/dm_check_password",
   }
   file { "${documentum}/dba/dm_secure_writer" :
     ensure => $ensure,
-    source => "${documentum}/product/7.1/install/external_apps/securewriter/dm_secure_writer",
+    source => "${documentum}/product/7.3/install/external_apps/securewriter/dm_secure_writer",
   }
   file { "${documentum}/dba/dm_assume_user" :
     ensure => $ensure,
-    source => "${documentum}/product/7.1/install/external_apps/assumeuser/dm_assume_user",
+    source => "${documentum}/product/7.3/install/external_apps/assumeuser/dm_assume_user",
   }
   file { "${documentum}/dba/dm_change_password.local" :
     ensure => $ensure,
-    source => "${documentum}/product/7.1/install/external_apps/changepass/dm_change_password.local",
+    source => "${documentum}/product/7.3/install/external_apps/changepass/dm_change_password.local",
   }
   file { "${documentum}/dba/dm_change_password.yp" :
     ensure => $ensure,
-    source => "${documentum}/product/7.1/install/external_apps/changepass/dm_change_password.yp",
+    source => "${documentum}/product/7.3/install/external_apps/changepass/dm_change_password.yp",
   }
 }
-

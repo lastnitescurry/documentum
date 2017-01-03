@@ -6,8 +6,8 @@
 class documentum::contentserver::repository_node() {
   $ensure          = 'file'
   $documentum      = '/u01/app/documentum'
-  $version         = '7.1'
-  $installer       = '/u01/app/documentum/product/7.1/install'
+  $version         = '7.3'
+  $installer       = '/u01/app/documentum/product/7.3/install'
   $docbroker_port  = '1489'
   $docbroker_name  = 'Docbroker'
   $docbroker_host  = $hostname
@@ -34,7 +34,7 @@ class documentum::contentserver::repository_node() {
     group     => dmadmin,
     source    => '/vagrant/repositorydata/dfc.properties',
   }
-  
+
   exec { "repository-create":
     command     => "${installer}/dm_launch_cfs_server_config_program.sh -f /home/dmadmin/sig/repository/repository_node.properties -r /home/dmadmin/sig/repository/response_node.properties -i Silent",
     cwd         => $installer,
@@ -64,8 +64,8 @@ class documentum::contentserver::repository_node() {
 #    require     => Exec["repository-create"],
 #    logoutput   => true,
 #  }
-  
-  # Convert Node from file serving content server to handle user sessions also 
+
+  # Convert Node from file serving content server to handle user sessions also
   exec { "content-server-stop":
     command     => "${documentum}/dba/dm_shutdown_farrengold_farrengold",
     cwd         => "${documentum}/dba",

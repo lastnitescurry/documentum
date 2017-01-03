@@ -6,8 +6,8 @@
 class documentum::contentserver::repository() {
   $ensure          = 'file'
   $documentum      = '/u01/app/documentum'
-  $version         = '7.1'
-  $installer       = '/u01/app/documentum/product/7.1/install'
+  $version         = '7.3'
+  $installer       = '/u01/app/documentum/product/7.3/install'
   $docbroker_port  = '1489'
   $docbroker_name  = 'Docbroker'
   $docbroker_host  = $hostname
@@ -27,7 +27,7 @@ class documentum::contentserver::repository() {
     owner     => dmadmin,
     group     => dmadmin,
   }
-  
+
   exec { "repository-create":
     command     => "${installer}/dm_launch_server_config_program.sh -f /home/dmadmin/sig/repository/repository.properties -r /home/dmadmin/sig/repository/response.properties -i Silent",
     cwd         => $installer,
@@ -49,7 +49,7 @@ class documentum::contentserver::repository() {
     timeout     => 3000,
     notify      => [File["dfc.properties"], Exec [ "r-install.log"], Exec [ "r-dmadmin.ServerConfigurator.log"]]
   }
-  
+
   exec { "r-install.log":
     command     => "/bin/cat ${installer}/logs/install.log",
     cwd         => $installer,
@@ -60,7 +60,7 @@ class documentum::contentserver::repository() {
     cwd         => $installer,
     logoutput   => true,
   }
-  
+
   file { 'dfc.properties':
     ensure    => file,
     path      => '/vagrant/repositorydata/dfc.properties',

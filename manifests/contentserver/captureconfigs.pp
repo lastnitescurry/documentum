@@ -1,5 +1,5 @@
 # == Define: contentserver
-# 
+#
 class documentum::contentserver::captureconfigs(
   $documentum_data  = '/vagrant/repositorydata',
   $capture_dir      = 'csmaster',
@@ -8,7 +8,7 @@ class documentum::contentserver::captureconfigs(
   $repo_log         = 'farrengold.log',
   $server_ini       = 'server.ini',
   ) {
-  
+
     file { 'capture-dir':
       ensure    => directory,
       path      => "${documentum_data}/${capture_dir}",
@@ -52,40 +52,39 @@ class documentum::contentserver::captureconfigs(
     # JMS Apps
     file { 'jms-web.xml':
       path      => "${documentum_data}/${capture_dir}/jms-web.xml",
-      source    => '/u01/app/documentum/shared/jboss7.1.1/server/DctmServer_MethodServer/deployments/ServerApps.ear/DmMethods.war/WEB-INF/web.xml',
+      source    => '/u01/app/documentum/shared/wildfily9.0.1/server/DctmServer_MethodServer/deployments/ServerApps.ear/DmMethods.war/WEB-INF/web.xml',
       require   => File["capture-dir"]
     }
     file { 'jms-dfc.properties':
       path      => "${documentum_data}/${capture_dir}/jms-dfc.properties",
-      source    => '/u01/app/documentum/shared/jboss7.1.1/server/DctmServer_MethodServer/deployments/ServerApps.ear/APP-INF/classes/dfc.properties',
+      source    => '/u01/app/documentum/shared/wildfily9.0.1/server/DctmServer_MethodServer/deployments/ServerApps.ear/APP-INF/classes/dfc.properties',
       require   => File["capture-dir"]
     }
-    
+
     # ACS Apps
     file { 'acs-dfc.properties':
       path      => "${documentum_data}/${capture_dir}/acs-dfc.properties",
-      source    => '/u01/app/documentum/shared/jboss7.1.1/server/DctmServer_MethodServer/deployments/acs.ear/lib/configs.jar/dfc.properties',
+      source    => '/u01/app/documentum/shared/wildfily9.0.1/server/DctmServer_MethodServer/deployments/acs.ear/lib/configs.jar/dfc.properties',
       require   => File["capture-dir"]
     }
     file { 'acs-jmx.properties':
       path      => "${documentum_data}/${capture_dir}/acs-jmx.properties",
-      source    => '/u01/app/documentum/shared/jboss7.1.1/server/DctmServer_MethodServer/deployments/acs.ear/lib/configs.jar/jmx.properties',
+      source    => '/u01/app/documentum/shared/wildfily9.0.1/server/DctmServer_MethodServer/deployments/acs.ear/lib/configs.jar/jmx.properties',
       require   => File["capture-dir"]
     }
     file { 'acs-ucf.server.config.xml':
       path      => "${documentum_data}/${capture_dir}/acs-ucf.server.config.xml",
-      source    => '/u01/app/documentum/shared/jboss7.1.1/server/DctmServer_MethodServer/deployments/acs.ear/lib/configs.jar/ucf.server.config.xml',
+      source    => '/u01/app/documentum/shared/wildfily9.0.1/server/DctmServer_MethodServer/deployments/acs.ear/lib/configs.jar/ucf.server.config.xml',
       require   => File["capture-dir"]
     }
     file { 'acs-acs.properties':
       path      => "${documentum_data}/${capture_dir}/acs-acs.properties",
-      source    => '/u01/app/documentum/shared/jboss7.1.1/server/DctmServer_MethodServer/deployments/acs.ear/lib/configs.jar/config/acs.properties',
+      source    => '/u01/app/documentum/shared/wildfily9.0.1/server/DctmServer_MethodServer/deployments/acs.ear/lib/configs.jar/config/acs.properties',
       require   => File["capture-dir"]
     }
     file { 'acs-acsfull.properties':
       path      => "${documentum_data}/${capture_dir}/acs-acsfull.properties",
-      source    => '/u01/app/documentum/shared/jboss7.1.1/server/DctmServer_MethodServer/deployments/acs.ear/lib/configs.jar/config/acsfull.properties',
+      source    => '/u01/app/documentum/shared/wildfily9.0.1/server/DctmServer_MethodServer/deployments/acs.ear/lib/configs.jar/config/acsfull.properties',
       require   => File["capture-dir"]
     }
 }
-

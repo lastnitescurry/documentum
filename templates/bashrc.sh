@@ -15,8 +15,8 @@ if [ -f /u01/app/oracle/product/11.2.0/xe/bin/oracle_env.sh ]; then
 fi
 
 echo "$(date) - bashrc - documentum - configure"
-if [ -f /u01/app/documentum/product/7.1/bin/dm_set_server_env.sh ]; then
-  . /u01/app/documentum/product/7.1/bin/dm_set_server_env.sh
+if [ -f /u01/app/documentum/product/7.3/bin/dm_set_server_env.sh ]; then
+  . /u01/app/documentum/product/7.3/bin/dm_set_server_env.sh
   echo "$(date) - bashrc - dmadmin - configured - from dm_set_server_env.sh"
 fi
 
