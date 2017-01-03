@@ -17,7 +17,7 @@ class documentum::contentserver::server() {
   $version    = '7.3'
 
   exec { "cs-installer":
-    command   => "/bin/tar xvf /opt/media/D73/Content_Server_7.3_linux64_oracle.tar",
+    command   => "/bin/tar xvf /opt/media/Repository/7.3/Content_Server_7.3_linux64_oracle.tar",
     cwd       => $installer,
     creates   => "${installer}/serverSetup.bin",
     user      => dmadmin,
