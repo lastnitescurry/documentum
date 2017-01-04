@@ -26,7 +26,7 @@ class documentum::contentserver::server() {
   }
 
   exec { "cs-install":
-    command     => "${installer}/serverSetup.bin  -r response.cs.properties -i Silent -DSERVER.DOCUMENTUM=${documentum} -DAPPSERVER.SERVER_HTTP_PORT=${port} -DAPPSERVER.SECURE.PASSWORD=dm_bof_registry",
+    command     => "${installer}/serverSetup.bin -i Silent -DAPPSERVER.SERVER_HTTP_PORT=${port} -DAPPSERVER.SECURE.PASSWORD=dm_bof_registry",
     cwd         => $installer,
     require     => [Exec["cs-installer"],
                     Group["dmadmin"],
