@@ -39,6 +39,7 @@ class documentum::contentserver::server() {
     creates     => "${documentum}/product/${version}/version.txt",
     user        => dmadmin,
     group       => dmadmin,
+    timeout     => 1800,
     logoutput   => true,
   }
 }
