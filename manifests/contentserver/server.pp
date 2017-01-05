@@ -11,6 +11,19 @@ class documentum::contentserver::server() {
 #    mode    => '0644',
 #    source  => 'puppet:///modules/documentum/server.properties',
 #  }
+
+ file { 'rngd-properties':
+   ensure  => file,
+   path    => '/etc/sysconfig/rndg',
+   owner   => root,
+   group   => root,
+   content => template('documentum/rngd.erb'),
+ }
+
+ service { 'rngd':
+   enable => true,
+ }
+
   $installer  = '/home/dmadmin/sig/cs'
   $documentum = '/u01/app/documentum'
   $port       = '9080'
@@ -18,6 +31,7 @@ class documentum::contentserver::server() {
 
   exec { "cs-installer":
     command   => "/bin/tar xvf /opt/media/Repository/7.3/Content_Server_7.3_linux64_oracle.tar",
+    require   => Service["rndg"],
     cwd       => $installer,
     creates   => "${installer}/serverSetup.bin",
     user      => dmadmin,
@@ -39,7 +53,7 @@ class documentum::contentserver::server() {
     creates     => "${documentum}/product/${version}/version.txt",
     user        => dmadmin,
     group       => dmadmin,
-    timeout     => 1800,
+#    timeout     => 1800,
     logoutput   => true,
   }
 }
