@@ -14,7 +14,7 @@ class documentum::contentserver::server() {
 
  file { 'rngd-properties':
    ensure  => file,
-   path    => '/etc/sysconfig/rndg',
+   path    => '/etc/sysconfig/rngd',
    owner   => root,
    group   => root,
    content => template('documentum/rngd.erb'),
@@ -31,7 +31,7 @@ class documentum::contentserver::server() {
 
   exec { "cs-installer":
     command   => "/bin/tar xvf /opt/media/Repository/7.3/Content_Server_7.3_linux64_oracle.tar",
-    require   => Service["rndg"],
+    require   => Service["rngd"],
     cwd       => $installer,
     creates   => "${installer}/serverSetup.bin",
     user      => dmadmin,
