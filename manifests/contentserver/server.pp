@@ -21,7 +21,8 @@ class documentum::contentserver::server() {
  }
 
  service { 'rngd':
-   enable => true,
+   ensure  => running,
+   enable  => true,
  }
 
   $installer  = '/home/dmadmin/sig/cs'
@@ -53,7 +54,7 @@ class documentum::contentserver::server() {
     creates     => "${documentum}/product/${version}/version.txt",
     user        => dmadmin,
     group       => dmadmin,
-#    timeout     => 1800,
+    timeout     => 1800,
     logoutput   => true,
   }
 }
