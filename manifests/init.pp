@@ -24,7 +24,6 @@ class documentum {
   Class [ 'documentum::contentserver::server' ]     ->
   Class [ 'documentum::contentserver::roottask' ]   ->
   Class [ 'documentum::contentserver::docbroker' ]  ->
-  Class['oracle::xe::server'] ->
   Class [ 'documentum::contentserver::repository' ] ->
   Class [ 'documentum::contentserver::captureconfigs' ]
 }
