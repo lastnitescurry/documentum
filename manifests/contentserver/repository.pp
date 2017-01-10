@@ -12,6 +12,15 @@ class documentum::contentserver::repository() {
   $docbroker_name  = 'Docbroker'
   $docbroker_host  = $hostname
   $documentum_data = '/vagrant/repositorydata'
+  $repository_name =
+  $repository_id   =
+  $repository_service =
+  $repository_desc =
+  $bof_registry_password =
+  $db_user         =
+  $db_password     =
+  $db_connection   =
+  $db_indexspace   =
 
   # template(<FILE REFERENCE>, [<ADDITIONAL FILES>, ...])
   file { 'repository-response':
@@ -42,7 +51,7 @@ class documentum::contentserver::repository() {
                     "ORACLE_HOME=/u01/app/oracle/product/12.1/client",
                     "ORACLE_SID=orcl",
                     ],
-    creates     => "${documentum}/dba/dm_start_farrengold",
+    creates     => "${documentum}/dba/dm_start_${repository_name}",
     user        => dmadmin,
     group       => dmadmin,
     logoutput   => true,
