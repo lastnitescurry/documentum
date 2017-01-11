@@ -1,4 +1,4 @@
-cd # == Define: contentserver
+# == Define: contentserver
 #
 # Adds an Apache configuration file.
 # http://stackoverflow.com/questions/19024134/calling-puppet-defined-resource-with-multiple-parameters-multiple-times
@@ -43,7 +43,7 @@ class documentum::contentserver::repository() {
     require     => [File["repository-response"],
                     File["repository-data-dir"],
                     Group["dmadmin"],
-                    User["dmadmin"]],
+                    User["dmadmin"],
                     File["tnsnames"],
                     Exec["clientInstall"],
     environment => ["HOME=/home/dmadmin",
