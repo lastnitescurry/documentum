@@ -1,4 +1,4 @@
-# == Define: contentserver
+cd # == Define: contentserver
 #
 # Adds an Apache configuration file.
 # http://stackoverflow.com/questions/19024134/calling-puppet-defined-resource-with-multiple-parameters-multiple-times
@@ -20,7 +20,7 @@ class documentum::contentserver::repository() {
   $db_user         = 'fcmsdb'
   $db_password     = 'fcmsdb'
   $db_connection   = 'orcl'
-  $db_indexspace   = 'fmcs'
+  $db_tablespace   = 'fcms'
 
   # template(<FILE REFERENCE>, [<ADDITIONAL FILES>, ...])
   file { 'repository-response':
@@ -44,6 +44,8 @@ class documentum::contentserver::repository() {
                     File["repository-data-dir"],
                     Group["dmadmin"],
                     User["dmadmin"]],
+                    File["tnsnames"],
+                    Exec["clientInstall"],
     environment => ["HOME=/home/dmadmin",
                     "DOCUMENTUM=${documentum}",
                     "DOCUMENTUM_SHARED=${documentum}/shared",
