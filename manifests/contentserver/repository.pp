@@ -12,15 +12,15 @@ class documentum::contentserver::repository() {
   $docbroker_name  = 'Docbroker'
   $docbroker_host  = $hostname
   $documentum_data = '/vagrant/repositorydata'
-  $repository_name =
-  $repository_id   =
-  $repository_service =
-  $repository_desc =
-  $bof_registry_password =
-  $db_user         =
-  $db_password     =
-  $db_connection   =
-  $db_indexspace   =
+  $repository_name = 'fcms'
+  $repository_id   = '16477215'
+  $repository_service = 'dm_fcms'
+  $repository_desc = 'auto repo build'
+  $bof_registry_password = '1234qwer'
+  $db_user         = 'fcmsdb'
+  $db_password     = 'fcmsdb'
+  $db_connection   = 'orcl'
+  $db_indexspace   = 'fmcs'
 
   # template(<FILE REFERENCE>, [<ADDITIONAL FILES>, ...])
   file { 'repository-response':
