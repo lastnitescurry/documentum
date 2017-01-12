@@ -45,7 +45,7 @@ class documentum::contentserver::repository() {
                     Group["dmadmin"],
                     User["dmadmin"],
                     File["tnsnames"],
-                    Exec["clientInstall"],
+                    Exec["clientInstall"]],
     environment => ["HOME=/home/dmadmin",
                     "DOCUMENTUM=${documentum}",
                     "DOCUMENTUM_SHARED=${documentum}/shared",
