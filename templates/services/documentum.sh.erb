@@ -1,0 +1,45 @@
+##
+# Documentum Environment
+# $Id: documentum.sh 24 2011-06-22 19:44:24Z mark.faine@gmail.com $
+##
+
+## 2017-01-18 Gareth McMillan
+## Coppied from Mark's work, updated to use DCTM7.3
+
+#to be placed in /etc/profile.d
+
+export DOCUMENTUM=<%=@documentum%>
+# Gets most recent version of Documentum
+DM_SERVER_VERSION="$(ls -lA ${DOCUMENTUM}/product | grep drwx | awk '{ print $9 }' | tr -d / | sort -n -r | head -n 1)"
+export DM_HOME="${DOCUMENTUM}/product/${DM_SERVER_VERSION}"
+export DOCUMENTUM_SHARED="${DOCUMENTUM}/shared"
+# Gets most recent version of Documentum JRE
+DM_JAVA_VERSION="$(ls -lA ${DOCUMENTUM_SHARED}/java64 | grep drwx | awk '{ print $9 }' | tr -d / | sort -n -r | head -n 1)"
+export JAVA_HOME="${DOCUMENTUM_SHARED}/java64/${DM_JAVA_VERSION}"
+
+# User configurable Documentum settings
+
+# Directory where pid file is created/checked
+PID_DIR=/var/run
+
+# Directory where lock file is created/saved
+LOCK_DIR=/var/lock/subsys
+
+# Documentum log directory
+LOGDIR="${DOCUMENTUM}/dba/log"
+
+# String format for date and time
+TIME="$(date +%m.%d.%Y.%H.%M.%S)"
+
+# Install owner account
+DMUSER=dmadmin
+
+# Environment
+export ORACLE_HOME=<%=@oracle_home%>
+export LD_LIBRARY_PATH="${DM_HOME}/bin:${DOCUMENTUM_SHARED}/dfc:${DOCUMENTUM}/dsearch:${JAVA_HOME}/jre/lib/amd64/server:${JAVA_HOME}/jre/lib/amd64:${ORACLE_HOME}/lib:${LD_LIBRARY_PATH}"
+export CLASSPATH="${DM_HOME}/dctm-server.jar:${DOCUMENTUM_SHARED}/dctm.jar:${DOCUMENTUM_SHARED}/config:${CLASSPATH}"
+export PATH="${JAVA_HOME}/bin:${DM_HOME}/bin:${DOCUMENTUM}/dba:${ORACLE_HOME}/bin:~/bin:${PATH}"
+export LANG=C
+# Be sure to update the below variables
+export NLS_LANG=AMERICAN_AMERICA.UTF8
+export TZ=CST6CDT

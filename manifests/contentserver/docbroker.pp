@@ -52,4 +52,23 @@ class documentum::contentserver::docbroker() {
     cwd         => $installer,
     logoutput   => true,
   }
+
+
+# coppying the service file across
+  file { 'docbroker-init.d':
+    ensure    => file,
+    path      => '/etc/init.d/${docbroker_name}',
+    owner     => root,
+    group     => root,
+    mode      => 755,
+    content   => template('documentum/services/docbroker.erb'),
+  }
+
+  exec {'chkconfig-docbroker':
+    require     => [File["docbroker-init.d"],
+                    Exec["docbroker-create"],
+                  ],
+    command  => "/sbin/chkconfig --add ${docbroker_name}; /sbin/chkconfig ${docbroker_name} on",
+    #onlyif   => ["! /sbin/service ${jms_service} status"],
+  }
 }

@@ -21,6 +21,7 @@ class documentum::contentserver::repository() {
   $db_password     = 'fcmsdb'
   $db_connection   = 'orcl'
   $db_tablespace   = 'fcms'
+  $service_name    = 'jms'
 
   # template(<FILE REFERENCE>, [<ADDITIONAL FILES>, ...])
   file { 'repository-response':
@@ -78,5 +79,23 @@ class documentum::contentserver::repository() {
     owner     => dmadmin,
     group     => dmadmin,
     source    => '/u01/app/documentum/shared/config/dfc.properties',
+  }
+
+# coppying the service file across
+  file { 'repository-init.d':
+    ensure    => file,
+    path      => '/etc/init.d/${repository_service}',
+    owner     => root,
+    group     => root,
+    mode      => 755,
+    content   => template('documentum/services/docbase.erb'),
+  }
+
+  exec {'repository-docbroker':
+    require     => [File["repository-init.d"],
+                    Exec["repository-create"],
+                  ],
+    command  => "/sbin/chkconfig --add ${repository_service}; /sbin/chkconfig ${repository_service} on",
+    #onlyif   => ["! /sbin/service ${jms_service} status"],
   }
 }

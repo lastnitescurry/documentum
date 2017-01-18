@@ -4,14 +4,13 @@
 # http://stackoverflow.com/questions/19024134/calling-puppet-defined-resource-with-multiple-parameters-multiple-times
 #
 class documentum::contentserver::server() {
-#  file { "cs-response-file":
-#    path    => '/home/dmadmin/sig/cs/server.properties',
-#    owner   => 'dmadmin',
-#    group   => 'dmadmin',
-#    mode    => '0644',
-#    source  => 'puppet:///modules/documentum/server.properties',
-#  }
 
+$installer  = '/home/dmadmin/sig/cs'
+$documentum = '/u01/app/documentum'
+$port       = '9080'
+$version    = '7.3'
+
+## random number generator necessary for 7.3
  file { 'rngd-properties':
    ensure  => file,
    path    => '/etc/sysconfig/rngd',
@@ -25,36 +24,81 @@ class documentum::contentserver::server() {
    enable  => true,
  }
 
-  $installer  = '/home/dmadmin/sig/cs'
-  $documentum = '/u01/app/documentum'
-  $port       = '9080'
-  $version    = '7.3'
+## making the JMS a service
+##TODO look at moving this out to another class
+ file { 'jms-serviceConfig':
+   ensure    => file,
+   path      => "/etc/default/${jms_service}.conf",
+   owner     => root,
+   group     => root,
+   mode      => 755,
+   content   => template('documentum/services/service.conf.erb'),
+ }
 
+ file { 'jms-serviceStartScript':
+   ensure    => file,
+   path      => "/etc/init.d/${jms_service}",
+   owner     => root,
+   group     => root,
+   mode      => 755,
+   content   => template('documentum/services/service.erb'),
+ }
+
+ exec {'chkconfig-jms':
+   require     => [File["jms-serviceConfig"],
+                   File["jms-serviceStartScript"],
+                 ],
+   command  => "/sbin/chkconfig --add ${jms_service}; /sbin/chkconfig ${jms_service} on",
+   #onlyif   => ["! /sbin/service ${jms_service} status"],
+ }
+
+## now we actually install the software
   exec { "cs-installer":
-    command   => "/bin/tar xvf /opt/media/Repository/7.3/Content_Server_7.3_linux64_oracle.tar",
-    require   => Service["rngd"],
-    cwd       => $installer,
-    creates   => "${installer}/serverSetup.bin",
-    user      => dmadmin,
-    group     => dmadmin,
-    logoutput => true,
+   command   => "/bin/tar xvf /opt/media/Repository/7.3/Content_Server_7.3_linux64_oracle.tar",
+   require   => Service["rngd"],
+   cwd       => $installer,
+   creates   => "${installer}/serverSetup.bin",
+   user      => dmadmin,
+   group     => dmadmin,
+   logoutput => true,
+}
+
+ exec { "cs-install":
+   command     => "${installer}/serverSetup.bin -i Silent -DAPPSERVER.SERVER_HTTP_PORT=${port} -DAPPSERVER.SECURE.PASSWORD=dm_bof_registry",
+   cwd         => $installer,
+   require     => [Exec["cs-installer"],
+                   Group["dmadmin"],
+                   User["dmadmin"]],
+   environment => ["HOME=/home/dmadmin",
+                   "DOCUMENTUM=${documentum}",
+                   "DOCUMENTUM_SHARED=${documentum}/shared",
+                   "DM_HOME=${documentum}/product/${version}"],
+#    creates     => "${installer}/response.cs.properties",
+   creates     => "${documentum}/product/${version}/version.txt",
+   user        => dmadmin,
+   group       => dmadmin,
+   timeout     => 1800,
+   logoutput   => true,
+ }
+
+## copy files across that will be necessary for DCTM services
+  file { 'documentum.sh':
+    ensure    => file,
+    require   => [Exec["cs-install"]],
+    path      => "/etc/profile.d/documentum.sh",
+    owner     => root,
+    group     => root,
+    mode      => 755,
+    content   => template('documentum/services/documentum.sh.erb'),
   }
 
-  exec { "cs-install":
-    command     => "${installer}/serverSetup.bin -i Silent -DAPPSERVER.SERVER_HTTP_PORT=${port} -DAPPSERVER.SECURE.PASSWORD=dm_bof_registry",
-    cwd         => $installer,
-    require     => [Exec["cs-installer"],
-                    Group["dmadmin"],
-                    User["dmadmin"]],
-    environment => ["HOME=/home/dmadmin",
-                    "DOCUMENTUM=${documentum}",
-                    "DOCUMENTUM_SHARED=${documentum}/shared",
-                    "DM_HOME=${documentum}/product/${version}"],
-#    creates     => "${installer}/response.cs.properties",
-    creates     => "${documentum}/product/${version}/version.txt",
-    user        => dmadmin,
-    group       => dmadmin,
-    timeout     => 1800,
-    logoutput   => true,
+  file { 'get_pid.sh':
+    ensure    => file,
+    require   => [Exec["cs-install"]],    
+    path      => "${documentum}/product/${version}/bin/get_pid.sh",
+    owner     => dmadmin,
+    group     => dmadmin,
+    mode      => 755,
+    content   => template('documentum/services/get_pid.sh.erb'),
   }
 }
