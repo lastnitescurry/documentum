@@ -5,10 +5,11 @@
 #
 class documentum::contentserver::server() {
 
-$installer  = '/home/dmadmin/sig/cs'
-$documentum = '/u01/app/documentum'
-$port       = '9080'
-$version    = '7.3'
+$installer   = '/home/dmadmin/sig/cs'
+$documentum  = '/u01/app/documentum'
+$port        = '9080'
+$version     = '7.3'
+$jms_service = 'jms'
 
 ## random number generator necessary for 7.3
  file { 'rngd-properties':
@@ -34,7 +35,6 @@ $version    = '7.3'
    mode      => 755,
    content   => template('documentum/services/service.conf.erb'),
  }
-
  file { 'jms-serviceStartScript':
    ensure    => file,
    path      => "/etc/init.d/${jms_service}",
@@ -94,11 +94,11 @@ $version    = '7.3'
 
   file { 'get_pid.sh':
     ensure    => file,
-    require   => [Exec["cs-install"]],    
-    path      => "${documentum}/product/${version}/bin/get_pid.sh",
+    require   => [Exec["cs-install"]],
+    path      => "${documentum}/product/${version}/bin/get_pid",
     owner     => dmadmin,
     group     => dmadmin,
     mode      => 755,
-    content   => template('documentum/services/get_pid.sh.erb'),
+    content   => template('documentum/services/get_pid.erb'),
   }
 }
