@@ -84,7 +84,7 @@ class documentum::contentserver::repository() {
 # coppying the service file across
   file { 'repository-init.d':
     ensure    => file,
-    path      => '/etc/init.d/${repository_service}',
+    path      => "/etc/init.d/${repository_service}",
     owner     => root,
     group     => root,
     mode      => 755,

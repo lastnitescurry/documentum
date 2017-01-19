@@ -57,7 +57,7 @@ class documentum::contentserver::docbroker() {
 # coppying the service file across
   file { 'docbroker-init.d':
     ensure    => file,
-    path      => '/etc/init.d/${docbroker_name}',
+    path      => "/etc/init.d/${docbroker_name}",
     owner     => root,
     group     => root,
     mode      => 755,

@@ -101,4 +101,22 @@ $jms_service = 'jms'
     mode      => 755,
     content   => template('documentum/services/get_pid.erb'),
   }
+
+  file { 'daemonize':
+    ensure    => file,
+    path      => "/usr/local/sbin/daemonize",
+    owner     => root,
+    group     => root,
+    mode      => 755,
+    source => 'puppet:///modules/documentum/daemonize';
+  }
+
+  file { 'daemonize.1':
+    ensure    => file,
+    path      => "/usr/local/share/man/man1/daemonize.1",
+    owner     => root,
+    group     => root,
+    mode      => 644,
+    source => 'puppet:///modules/documentum/daemonize.1';
+  }
 }
