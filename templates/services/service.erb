@@ -20,7 +20,7 @@ export JAVA_HOME
 
 # Load JBoss AS init.d configuration.
 if [ -z "$JBOSS_CONF" ]; then
-	JBOSS_CONF="/etc/default/<%=@service_name%>.conf"
+	JBOSS_CONF="/etc/default/<%=@jms_service%>.conf"
 fi
 
 [ -r "$JBOSS_CONF" ] && . "${JBOSS_CONF}"
@@ -33,12 +33,12 @@ fi
 export JBOSS_HOME
 
 if [ -z "$JBOSS_PIDFILE" ]; then
-	JBOSS_PIDFILE=/var/run/wildfly/<%=@service_name%>.pid
+	JBOSS_PIDFILE=/var/run/wildfly/<%=@jms_service%>.pid
 fi
 export JBOSS_PIDFILE
 
 if [ -z "$JBOSS_CONSOLE_LOG" ]; then
-	JBOSS_CONSOLE_LOG=/var/log/wildfly/<%=@service_name%>.log
+	JBOSS_CONSOLE_LOG=/var/log/wildfly/<%=@jms_service%>.log
 fi
 
 if [ -z "$STARTUP_WAIT" ]; then

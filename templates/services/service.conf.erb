@@ -5,13 +5,13 @@
 # default location: /etc/default/wildfly
 
 ## Location of JDK
-JAVA_HOME="<%=@xplore_home%>/java64/1.8.0_77"
+JAVA_HOME="<%=@documentum%>/shared/java64/1.8.0_77"
 
 ## Location of WildFly
-JBOSS_HOME="<%=@xplore_home%>/wildfly9.0.1"
+JBOSS_HOME="<%=@documentum%>/shared/wildfly9.0.1"
 
 ## The username who should own the process.
-JBOSS_USER=xplore
+JBOSS_USER=dmadmin
 
 ## The mode WildFly should start, standalone or domain
 JBOSS_MODE=standalone
@@ -30,7 +30,7 @@ STARTUP_WAIT=60
 SHUTDOWN_WAIT=60
 
 ## Location to keep the console log
-JBOSS_CONSOLE_LOG="/var/log/wildfly/<%=@service_name%>.log"
+JBOSS_CONSOLE_LOG="/var/log/wildfly/<%=@jms_service%>.log"
 
 ## Additionals args to include in startup
-JBOSS_OPTS="-Djboss.server.base.dir=<%=@xplore_home%>/wildfly9.0.1/server/DctmServer_<%=@service_name%>"
+JBOSS_OPTS="-Djboss.server.base.dir=<%=@documentum%>/shared/wildfly9.0.1/server/DctmServer_DctmServer_MethodServer"
