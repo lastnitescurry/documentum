@@ -10,6 +10,7 @@ $documentum  = '/u01/app/documentum'
 $port        = '9080'
 $version     = '7.3'
 $jms_service = 'jms'
+$oracle_home = '/u01/app/oracle/product/12.1/client'
 
 ## random number generator necessary for 7.3
  file { 'rngd-properties':
