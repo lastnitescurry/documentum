@@ -60,7 +60,8 @@ fi
 
 # Startup mode script
 if [ "$JBOSS_MODE" = "standalone" ]; then
-	JBOSS_SCRIPT=$JBOSS_HOME/bin/standalone.sh
+	JBOSS_SCRIPT=<%=@documentum%>/shared/wildfly9.0.1/server/startMethodServer.sh
+
 	if [ -z "$JBOSS_CONFIG" ]; then
 		JBOSS_CONFIG=standalone.xml
 	fi
