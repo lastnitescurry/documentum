@@ -3,25 +3,27 @@
 # Adds an Apache configuration file.
 # http://stackoverflow.com/questions/19024134/calling-puppet-defined-resource-with-multiple-parameters-multiple-times
 #
-class documentum::contentserver::repository() {
-  $ensure          = 'file'
-  $documentum      = '/u01/app/documentum'
-  $version         = '7.3'
-  $installer       = '/u01/app/documentum/product/7.3/install'
-  $docbroker_port  = '1489'
-  $docbroker_name  = 'Docbroker'
-  $docbroker_host  = $hostname
-  $documentum_data = '/vagrant/repositorydata'
-  $repository_name = 'fcms'
-  $repository_id   = '16477215'
-  $repository_service = 'dm_fcms'
-  $repository_desc = 'auto repo build'
-  $bof_registry_password = '1234qwer'
-  $db_user         = 'fcmsdb'
-  $db_password     = 'fcmsdb'
-  $db_connection   = 'orcl'
-  $db_tablespace   = 'fcms'
-  $service_name    = 'jms'
+class documentum::contentserver::repository(
+  $ensure,
+  $documentum,
+  $version,
+  $installer,
+  $docbroker_port,
+  $docbroker_name,
+  $docbroker_host,
+  $documentum_data,
+  $repository_name,
+  $repository_id,
+  $repository_service,
+  $repository_desc,
+  $bof_registry_password,
+  $db_user,
+  $db_password,
+  $db_connection,
+  $db_tablespace,
+  $service_name
+  ) {
+
 
   # template(<FILE REFERENCE>, [<ADDITIONAL FILES>, ...])
   file { 'repository-response':
