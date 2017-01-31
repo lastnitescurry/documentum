@@ -3,84 +3,77 @@
 # Adds an Apache configuration file.
 # http://stackoverflow.com/questions/19024134/calling-puppet-defined-resource-with-multiple-parameters-multiple-times
 #
-class documentum::contentserver::repository(
-  $ensure,
+define documentum::contentserver::repository(
+  $installer_location,
   $documentum,
+  $dctm_owner,
+  $dctm_group,
   $version,
-  $installer,
+
   $docbroker_port,
   $docbroker_name,
   $docbroker_host,
-  $documentum_data,
-  $repository_name,
+
+  $repository_name = $name,
   $repository_id,
   $repository_service,
   $repository_desc,
-  $bof_registry_password,
+  $repository_host,
+  $repository_data_dir,
   $db_user,
   $db_password,
   $db_connection,
   $db_tablespace,
-  $service_name
-  ) {
+  $oracle_home,
+  $bof_registry_password,
 
+  $installer      = "${documentum}/product/${version}/install",
+  ) {
 
   # template(<FILE REFERENCE>, [<ADDITIONAL FILES>, ...])
   file { 'repository-response':
     ensure    => file,
-    path      => '/home/dmadmin/sig/repository/repository.properties',
-    owner     => dmadmin,
-    group     => dmadmin,
+    path      => "${installer_location}/repository/repository.properties",
+    owner     => $dctm_owner,
+    group     => $dctm_group,
     content   => template('documentum/repository.properties.erb'),
   }
   file { 'repository-data-dir':
     ensure    => directory,
-    path      => $documentum_data,
-    owner     => dmadmin,
-    group     => dmadmin,
+    path      => $repository_data_dir,
+    owner     => $dctm_owner,
+    group     => $dctm_group,
   }
 
   exec { "repository-create":
-    command     => "${installer}/dm_launch_server_config_program.sh -f /home/dmadmin/sig/repository/repository.properties -r /home/dmadmin/sig/repository/response.properties -i Silent",
+    command     => "${installer}/dm_launch_server_config_program.sh -f ${installer_location}/repository/repository.properties -r ${installer_location}/repository/response.properties -i Silent",
     cwd         => $installer,
     require     => [File["repository-response"],
                     File["repository-data-dir"],
-                    Group["dmadmin"],
-                    User["dmadmin"],
+                    User["${dctm_owner}"],
                     File["tnsnames"],
                     Exec["clientInstall"]],
-    environment => ["HOME=/home/dmadmin",
+    environment => ["HOME=/home/${dctm_owner}",
                     "DOCUMENTUM=${documentum}",
                     "DOCUMENTUM_SHARED=${documentum}/shared",
                     "DM_HOME=${documentum}/product/${version}",
-                    "ORACLE_HOME=/u01/app/oracle/product/12.1/client",
-                    "ORACLE_SID=orcl",
+                    "ORACLE_HOME=${oracle_home}",
+                    "ORACLE_SID=${db_connection}",
                     ],
     creates     => "${documentum}/dba/dm_start_${repository_name}",
-    user        => dmadmin,
-    group       => dmadmin,
+    user        => $dctm_owner,
+    group       => $dctm_group,
     logoutput   => true,
     timeout     => 3000,
-    notify      => [File["dfc.properties"], Exec [ "r-install.log"], Exec [ "r-dmadmin.ServerConfigurator.log"]]
-  }
-
-  exec { "r-install.log":
-    command     => "/bin/cat ${installer}/logs/install.log",
-    cwd         => $installer,
-    logoutput   => true,
-  }
-  exec { "r-dmadmin.ServerConfigurator.log":
-    command     => "/bin/cat ${installer}/dmadmin.ServerConfigurator.log",
-    cwd         => $installer,
-    logoutput   => true,
+    notify      => [File["dfc.properties"]]
   }
 
   file { 'dfc.properties':
     ensure    => file,
     path      => '/vagrant/repositorydata/dfc.properties',
-    owner     => dmadmin,
-    group     => dmadmin,
-    source    => '/u01/app/documentum/shared/config/dfc.properties',
+    owner      => $dctm_owner,
+    group     => $dctm_group,
+    source    => "${documentum}/shared/config/dfc.properties",
   }
 
 # coppying the service file across
@@ -98,6 +91,6 @@ class documentum::contentserver::repository(
                     Exec["repository-create"],
                   ],
     command  => "/sbin/chkconfig --add ${repository_service}; /sbin/chkconfig ${repository_service} on",
-    #onlyif   => ["! /sbin/service ${jms_service} status"],
+    onlyif   =>  "/usr/bin/test `/sbin/chkconfig --list | /bin/grep ${repository_service} | /usr/bin/wc -l` -eq 0",
   }
 }

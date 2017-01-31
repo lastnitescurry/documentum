@@ -32,7 +32,7 @@ LOGDIR="${DOCUMENTUM}/dba/log"
 TIME="$(date +%m.%d.%Y.%H.%M.%S)"
 
 # Install owner account
-DMUSER=dmadmin
+DMUSER=<%=@dctm_owner%>
 
 # Environment
 export ORACLE_HOME=<%=@oracle_home%>

@@ -11,7 +11,7 @@ JAVA_HOME="<%=@documentum%>/shared/java64/1.8.0_77"
 JBOSS_HOME="<%=@documentum%>/shared/wildfly9.0.1"
 
 ## The username who should own the process.
-JBOSS_USER=dmadmin
+JBOSS_USER=<%=@dctm_owner%>
 
 ## The mode WildFly should start, standalone or domain
 JBOSS_MODE=standalone

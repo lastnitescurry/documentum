@@ -32,15 +32,12 @@ SERVICE_NAME="Documentum Docbroker"
 PROCESS=<%=@docbroker_name%>
 PROCESS_PORT=<%=@docbroker_port%>
 PROCESS_CONFIG_FILE=${DOCUMENTUM}/dba/Docbroker.ini
-#PROCESS_START_CMD="${DM_HOME}/bin/dmdocbroker -port ${PROCESS_PORT} -init_file ${PROCESS_CONFIG_FILE}"
-PROCESS_START_CMD="${DOCUMENTUM}/dba/dm_launch_Docbroker"
-#PROCESS_STOP_CMD="${DM_HOME}/bin/dmshutdown docbroker -B -T$(hostname) -P -N${PROCESS_PORT}"
-PROCESS_STOP_CMD="${DOCUMENTUM}/dba/dm_shutdown_Docbroker"
+PROCESS_START_CMD="${DM_HOME}/bin/dmdocbroker -port ${PROCESS_PORT} -init_file ${PROCESS_CONFIG_FILE}"
+PROCESS_STOP_CMD="${DM_HOME}/bin/dmshutdown docbroker -B -T$(hostname) -P -N${PROCESS_PORT}"
 
 ## End Specific to this process
 
 PROCESS_PID_FILE=${DOCUMENTUM}/dba/${PROCESS}.pid
-PROCESS_LOCK_FILE=${DOCUMENTUM}/dba/${PROCESS}
 
 # Logging
 if [[ ! -z "${LOGDIR}" && "${LOGDIR}" != ""  &&  -e "${LOGDIR}" ]]; then
@@ -56,13 +53,13 @@ function start_process(){
   echo -n "Starting ${PROCESS} on port ${PROCESS_PORT}: "
   if [ ! -z "$DMUSER" ]; then
     if [ "$EUID" = "0" ]; then
-      ${DAEMONIZE} -u ${DMUSER} -c ${DM_HOME}/bin -e ${PROCESS_LOGFILE} -o ${PROCESS_LOGFILE} -p ${PROCESS_PID_FILE} -l ${PROCESS_LOCK_FILE} ${PROCESS_START_CMD}
-	elif [ "$EUID" = $(id -u $DMUSER) ];  then
-      ${DAEMONIZE} -c ${DM_HOME}/bin -e ${PROCESS_LOGFILE} -o ${PROCESS_LOGFILE} -p ${PROCESS_PID_FILE} -l ${PROCESS_LOCK_FILE} ${PROCESS_START_CMD}
-  else
-	  echo "Service must be run as root, or $DMUSER"
-	  exit
-	fi
+      ${DAEMONIZE} -u ${DMUSER} -c ${DM_HOME}/bin -e ${PROCESS_LOGFILE} -o ${PROCESS_LOGFILE} -p ${PROCESS_PID_FILE} ${PROCESS_START_CMD}
+	  elif [ "$EUID" = $(id -u $DMUSER) ];  then
+      ${DAEMONIZE} -c ${DM_HOME}/bin -e ${PROCESS_LOGFILE} -o ${PROCESS_LOGFILE} -p ${PROCESS_PID_FILE} ${PROCESS_START_CMD}
+    else
+	    echo "Service must be run as root, or $DMUSER"
+	    exit
+	  fi
   fi
   if [[ $? -eq 0 ]]; then
    success "${SERVICE_NAME} startup"
@@ -74,24 +71,43 @@ function start_process(){
 }
 
 function stop_process(){
-  # Stop dependent processes - should be done automatically with LSB but not working
-  for file in $( find /etc/init.d/ -type f -name 'documentum-*' | sort )
-    do
-	  $file stop
-    done
-  pid="$(cat ${PROCESS_PID_FILE})"
-  echo -n "Stopping ${PROCESS} (pid $pid) on port ${PROCESS_PORT}: "
-  killproc ${PROCESS}
-  if [[ $? -eq 0 ]]; then
-   if [[ -e ${PROCESS_LOCK_FILE} ]]; then
-     rm -f ${PROCESS_LOCK_FILE}
-   fi
-   success "${PROCESS}" shutdown
-  else
-   failure "${PROCESS}" shutdown
+  DAEMONIZE=/usr/local/sbin/daemonize
+  echo -n "Stopping ${PROCESS} on port ${PROCESS_PORT}: "
+  if [ ! -z "$DMUSER" ]; then
+    if [ "$EUID" = "0" ]; then
+      ${DAEMONIZE} -u ${DMUSER} -c ${DM_HOME}/bin -e ${PROCESS_LOGFILE} -o ${PROCESS_LOGFILE} -p ${PROCESS_PID_FILE} ${PROCESS_STOP_CMD}
+	  elif [ "$EUID" = $(id -u $DMUSER) ];  then
+      ${DAEMONIZE} -c ${DM_HOME}/bin -e ${PROCESS_LOGFILE} -o ${PROCESS_LOGFILE} -p ${PROCESS_PID_FILE} ${PROCESS_STOP_CMD}
+    else
+	    echo "Service must be run as root, or $DMUSER"
+	    exit
+	  fi
   fi
-  echo
+  if [[ $? -eq 0 ]]; then
+   success "${SERVICE_NAME} stopped"
+   rm -f ${PROCESS_PID_FILE}
+   echo
+  else
+   failure "${SERVICE_NAME} stopped"
+   echo
+  fi
 }
+
+status() {
+	if [ -f $PROCESS_PID_FILE ]; then
+		read ppid < $PROCESS_PID_FILE
+		if [ `ps --pid $ppid 2> /dev/null | grep -c $ppid 2> /dev/null` -eq '1' ]; then
+			echo "$PROCESS is running (pid $ppid)"
+			return 0
+		else
+			echo "$PROCESS dead but pid file exists"
+			return 1
+		fi
+	fi
+	echo "$PROCESS is not running"
+	return 3
+}
+
 # End Specific to this process
 
 
@@ -121,7 +137,7 @@ case "$1" in
 	    $0 start
         ;;
   status)
-	   status ${PROCESS}
+	   status
 	    ;;
   *)
         echo "Usage: service ${PROCESS} {start|start_all|stop|restart|status}"
