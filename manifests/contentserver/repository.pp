@@ -65,15 +65,6 @@ define documentum::contentserver::repository(
     group       => $dctm_group,
     logoutput   => true,
     timeout     => 3000,
-    notify      => [File["dfc.properties"]]
-  }
-
-  file { 'dfc.properties':
-    ensure    => file,
-    path      => '/vagrant/repositorydata/dfc.properties',
-    owner      => $dctm_owner,
-    group     => $dctm_group,
-    source    => "${documentum}/shared/config/dfc.properties",
   }
 
 # coppying the service file across

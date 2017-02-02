@@ -71,6 +71,7 @@ define documentum::contentserver::server(
    command     => "${installer_location}/serverSetup.bin -i Silent -DAPPSERVER.SERVER_HTTP_PORT=${jms_port} -DAPPSERVER.SECURE.PASSWORD=${bof_registry_password}",
    cwd         => $installer_location,
    require     => [Exec["cs-installer"],
+                   Host["dctm.local"],
                    User["${dctm_owner}"]],
    environment => ["HOME=/home/${dctm_owner}",
                    "DOCUMENTUM=${documentum}",
