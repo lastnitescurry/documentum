@@ -37,7 +37,7 @@ define documentum::xplore::indexagent(
     path      => "${installer_location}/ia/indexagent.properties",
     owner     => $xplore_owner,
     group     => $xplore_group,
-    content   => template('xplore/indexagent.properties.erb'),
+    content   => template('documentum/xplore/indexagent.properties.erb'),
   }
 
   file { 'ia-serviceConfig':
@@ -46,7 +46,7 @@ define documentum::xplore::indexagent(
     owner     => root,
     group     => root,
     mode      => 755,
-    content   => template('xplore/service.conf.erb'),
+    content   => template('documentum/xplore/service.conf.erb'),
   }
 
   file { 'ia-serviceStartScript':
@@ -55,7 +55,7 @@ define documentum::xplore::indexagent(
     owner     => root,
     group     => root,
     mode      => 755,
-    content   => template('xplore/service.erb'),
+    content   => template('documentum/xplore/service.erb'),
   }
 
   exec {'chkconfig-ia':
