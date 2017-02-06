@@ -30,7 +30,7 @@ define documentum::contentserver::server(
  }
 
  exec {'libsas':
-   command  => "ln -s /usr/lib64/libsasl2.so.3.0.0 /usr/lib64/libsasl2.so.2",
+   command  => "/bin/ln -s /usr/lib64/libsasl2.so.3.0.0 /usr/lib64/libsasl2.so.2",
   creates   => "/usr/lib64/libsasl2.so.2",
  }
 
