@@ -29,6 +29,12 @@ define documentum::contentserver::server(
    enable  => true,
  }
 
+ exec {'libsas':
+   command  => "ln -s /usr/lib64/libsasl2.so.3.0.0 /usr/lib64/libsasl2.so.2",
+  creates   => "/usr/lib64/libsasl2.so.2",
+ }
+
+
 ## making the JMS a service
 ##TODO look at moving this out to another class
  file { 'jms-serviceConfig':
@@ -72,7 +78,8 @@ define documentum::contentserver::server(
    cwd         => $installer_location,
    require     => [Exec["cs-installer"],
                    Host["dctm.local"],
-                   User["${dctm_owner}"]],
+                   User["${dctm_owner}"],
+                   Exec["libsas"]],
    environment => ["HOME=/home/${dctm_owner}",
                    "DOCUMENTUM=${documentum}",
                    "DOCUMENTUM_SHARED=${documentum}/shared",
