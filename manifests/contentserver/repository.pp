@@ -36,7 +36,7 @@ define documentum::contentserver::repository(
     path      => "${installer_location}/repository/repository.properties",
     owner     => $dctm_owner,
     group     => $dctm_group,
-    content   => template('documentum/repository.properties.erb'),
+    content   => template('documentum/contentserver/repository.properties.erb'),
   }
   file { 'repository-data-dir':
     ensure    => directory,

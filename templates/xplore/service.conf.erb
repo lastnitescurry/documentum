@@ -1,0 +1,36 @@
+## /etc/default/dsearch.conf
+
+# General configuration for the init.d scripts,
+# not necessarily for JBoss AS itself.
+# default location: /etc/default/wildfly
+
+## Location of JDK
+JAVA_HOME="<%=@xplore_home%>/java64/1.8.0_77"
+
+## Location of WildFly
+JBOSS_HOME="<%=@xplore_home%>/wildfly9.0.1"
+
+## The username who should own the process.
+JBOSS_USER=xplore
+
+## The mode WildFly should start, standalone or domain
+JBOSS_MODE=standalone
+
+## Configuration for standalone mode
+JBOSS_CONFIG=standalone.xml
+
+## Configuration for domain mode
+# JBOSS_DOMAIN_CONFIG=domain.xml
+# JBOSS_HOST_CONFIG=host-master.xml
+
+## The amount of time to wait for startup
+STARTUP_WAIT=60
+
+## The amount of time to wait for shutdown
+SHUTDOWN_WAIT=60
+
+## Location to keep the console log
+JBOSS_CONSOLE_LOG="/var/log/wildfly/<%=@service_name%>.log"
+
+## Additionals args to include in startup
+JBOSS_OPTS="-Djboss.server.base.dir=<%=@xplore_home%>/wildfly9.0.1/server/DctmServer_<%=@service_name%>"

@@ -21,7 +21,7 @@ define documentum::contentserver::docbroker(
     path      => "${installer_location}/docbroker/docbroker.properties",
     owner     => $dctm_owner,
     group     => $dctm_group,
-    content   => template('documentum/docbroker.properties.erb'),
+    content   => template('documentum/contentserver/docbroker.properties.erb'),
   }
 
   exec { "docbroker-create":

@@ -6,7 +6,7 @@
 # http://theruddyduck.typepad.com/theruddyduck/2013/11/using-puppet-to-configure-users-groups-and-passwords-for-cloudera-manager.html
 # http://stackoverflow.com/questions/19024134/calling-puppet-defined-resource-with-multiple-parameters-multiple-times
 
-class documentum (
+class documentum::contentserver (
   $installer_location,
   $source_location,
   $documentum,
