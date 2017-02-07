@@ -3,9 +3,9 @@ Description=<%=@service_name%>
 After=network.target
 
 [Service]
-Type=oneshot
+Type=simple
 ExecStart=/bin/nohup <%=@xplore_home%>/wildfly9.0.1/server/start<%=@service_name%>.sh &>/dev/null &
-ExecStop=<%=@xplore_home%>/shared/wildfly9.0.1/server/stop<%=@service_name%>.sh
+ExecStop=<%=@xplore_home%>/wildfly9.0.1/server/stop<%=@service_name%>.sh
 RemainAfterExit=yes
 Environment="<%=@xplore_home%>/java64/JAVA_LINK"
 User=<%=@xplore_owner%>
