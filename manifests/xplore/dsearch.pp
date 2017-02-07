@@ -41,7 +41,7 @@ define documentum::xplore::dsearch(
   exec {'chkconfig-dsearch':
     require     => [File["dsearch-serviceStartScript"],
                   ],
-    command  => "systemctl --system daemon-reload",
+    command  => "/bin/systemctl --system daemon-reload",
   }
 
 

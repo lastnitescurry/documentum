@@ -52,7 +52,7 @@ define documentum::xplore::indexagent(
   exec {'chkconfig-ia':
     require     => [File["ia-serviceStartScript"],
                   ],
-    command  => "systemctl --system daemon-reload",
+    command  => "/bin/systemctl --system daemon-reload",
   }
 
   exec { "ia-create":

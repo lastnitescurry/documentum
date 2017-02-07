@@ -43,7 +43,7 @@ define documentum::contentserver::server(
    owner     => root,
    group     => root,
    mode      => 755,
-   content   => template('documentum/content/jms.service.erb'),
+   content   => template('documentum/contentserver/jms.service.erb'),
  }
 
  file { 'dctm-env':
@@ -52,14 +52,14 @@ define documentum::contentserver::server(
    owner     => root,
    group     => root,
    mode      => 755,
-   content   => template('documentum/content/dctm.erb'),
+   content   => template('documentum/contentserver/dctm.erb'),
  }
 
  exec {'chkconfig-jms':
    require     => [File["jms-serviceStartScript"],
                    File["dctm-env"],
                  ],
-   command  => "systemctl --system daemon-reload",
+   command  => "/bin/systemctl --system daemon-reload",
    }
 
 ## now we actually install the software

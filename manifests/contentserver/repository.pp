@@ -74,11 +74,11 @@ define documentum::contentserver::repository(
     owner     => root,
     group     => root,
     mode      => 755,
-    content   => template('documentum/services/repository.service.erb'),
+    content   => template('documentum/contentserver/repository.service.erb'),
   }
   exec {'repository-docbroker':
     require     => [File["repository-service"],
                   ],
-    command  => "systemctl --system daemon-reload",
+    command  => "/bin/systemctl --system daemon-reload",
     }
 }

@@ -48,11 +48,11 @@ define documentum::contentserver::docbroker(
     owner     => root,
     group     => root,
     mode      => 755,
-    content   => template('documentum/services/docbroker.service.erb'),
+    content   => template('documentum/contentserver/docbroker.service.erb'),
   }
   exec {'chkconfig-docbroker':
     require     => [File["docbroker-service"],
                   ],
-    command  => "systemctl --system daemon-reload",
+    command  => "/bin/systemctl --system daemon-reload",
     }
 }
