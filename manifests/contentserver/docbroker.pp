@@ -42,20 +42,17 @@ define documentum::contentserver::docbroker(
   }
 
 # coppying the service file across
-  file { 'docbroker-init.d':
+  file { 'docbroker-service':
     ensure    => file,
-    path      => "/etc/init.d/${docbroker_name}",
+    path      => "/usr/lib/systemd/system/${docbroker_name}.service",
     owner     => root,
     group     => root,
     mode      => 755,
-    content   => template('documentum/services/docbroker.erb'),
+    content   => template('documentum/services/docbroker.service.erb'),
   }
-
   exec {'chkconfig-docbroker':
-    require     => [File["docbroker-init.d"],
-                    Exec["docbroker-create"],
+    require     => [File["docbroker-service"],
                   ],
-    command  => "/sbin/chkconfig --add ${docbroker_name}; /sbin/chkconfig ${docbroker_name} on",
-    onlyif    =>  "/usr/bin/test `/sbin/chkconfig --list | /bin/grep ${docbroker_name} | /usr/bin/wc -l` -eq 0",
-  }
+    command  => "systemctl --system daemon-reload",
+    }
 }

@@ -1,0 +1,14 @@
+[Unit]
+Description=Docbroker
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=<%=@documentum%>/dba/dm_launch_<%=@docbroker_name%>
+ExecStop=<%=@documentum%>/dba/dm_stop_<%=@docbroker_name%>
+RemainAfterExit=yes
+User=<%=@dctm_owner%>
+EnvironmentFile=/etc/default/dctm
+
+[Install]
+WantedBy=multi-user.target

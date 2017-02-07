@@ -29,18 +29,9 @@ define documentum::xplore::dsearch(
     content   => template('documentum/xplore/dsearch.properties.erb'),
   }
 
-  file { 'dsearch-serviceConfig':
-    ensure    => file,
-    path      => "/etc/default/${dsearch_service}.conf",
-    owner     => root,
-    group     => root,
-    mode      => 755,
-    content   => template('documentum/xplore/service.conf.erb'),
-  }
-
   file { 'dsearch-serviceStartScript':
     ensure    => file,
-    path      => "/etc/init.d/${dsearch_service}",
+    path      => "/usr/lib/systemd/system/${service_name}.service",
     owner     => root,
     group     => root,
     mode      => 755,
@@ -48,11 +39,9 @@ define documentum::xplore::dsearch(
   }
 
   exec {'chkconfig-dsearch':
-    require     => [File["dsearch-serviceConfig"],
-                    File["dsearch-serviceStartScript"],
+    require     => [File["dsearch-serviceStartScript"],
                   ],
-    command  => "/sbin/chkconfig --add ${dsearch_service}; /sbin/chkconfig ${dsearch_service} on",
-    onlyif    =>  "/usr/bin/test `/sbin/chkconfig --list | /bin/grep ${dsearch_service} | /usr/bin/wc -l` -eq 0",
+    command  => "systemctl --system daemon-reload",
   }
 
 
@@ -76,7 +65,6 @@ define documentum::xplore::dsearch(
     enable  => true,
     require => [Exec["chkconfig-dsearch"],
                 Exec["dsearch-create"],
-                File["dsearch-serviceConfig"],
                 File["dsearch-serviceStartScript"],]
   }
 

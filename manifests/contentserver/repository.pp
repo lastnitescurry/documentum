@@ -68,20 +68,17 @@ define documentum::contentserver::repository(
   }
 
 # coppying the service file across
-  file { 'repository-init.d':
+  file { 'repository-service':
     ensure    => file,
-    path      => "/etc/init.d/${repository_service}",
+    path      => "/usr/lib/systemd/system/${repository_name}.service",
     owner     => root,
     group     => root,
     mode      => 755,
-    content   => template('documentum/services/docbase.erb'),
+    content   => template('documentum/services/repository.service.erb'),
   }
-
   exec {'repository-docbroker':
-    require     => [File["repository-init.d"],
-                    Exec["repository-create"],
+    require     => [File["repository-service"],
                   ],
-    command  => "/sbin/chkconfig --add ${repository_service}; /sbin/chkconfig ${repository_service} on",
-    onlyif   =>  "/usr/bin/test `/sbin/chkconfig --list | /bin/grep ${repository_service} | /usr/bin/wc -l` -eq 0",
-  }
+    command  => "systemctl --system daemon-reload",
+    }
 }

@@ -40,18 +40,9 @@ define documentum::xplore::indexagent(
     content   => template('documentum/xplore/indexagent.properties.erb'),
   }
 
-  file { 'ia-serviceConfig':
-    ensure    => file,
-    path      => "/etc/default/${service_name}.conf",
-    owner     => root,
-    group     => root,
-    mode      => 755,
-    content   => template('documentum/xplore/service.conf.erb'),
-  }
-
   file { 'ia-serviceStartScript':
     ensure    => file,
-    path      => "/etc/init.d/${service_name}",
+    path      => "/usr/lib/systemd/system/${service_name}.service",
     owner     => root,
     group     => root,
     mode      => 755,
@@ -59,11 +50,9 @@ define documentum::xplore::indexagent(
   }
 
   exec {'chkconfig-ia':
-    require     => [File["ia-serviceConfig"],
-                    File["ia-serviceStartScript"],
+    require     => [File["ia-serviceStartScript"],
                   ],
-    command  => "/sbin/chkconfig --add ${ia_service_name}; /sbin/chkconfig ${ia_service_name} on",
-    onlyif    =>  "/usr/bin/test `/sbin/chkconfig --list | /bin/grep ${ia_service_name} | /usr/bin/wc -l` -eq 0",
+    command  => "systemctl --system daemon-reload",
   }
 
   exec { "ia-create":
@@ -86,7 +75,6 @@ define documentum::xplore::indexagent(
     enable  => true,
     require => [Exec["chkconfig-ia"],
                 Exec["ia-create"],
-                File["ia-serviceConfig"],
                 File["ia-serviceStartScript"],]
   }
 }

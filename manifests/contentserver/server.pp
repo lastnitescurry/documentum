@@ -37,35 +37,36 @@ define documentum::contentserver::server(
 
 ## making the JMS a service
 ##TODO look at moving this out to another class
- file { 'jms-serviceConfig':
-   ensure    => file,
-   path      => "/etc/default/${jms_service}.conf",
-   owner     => root,
-   group     => root,
-   mode      => 755,
-   content   => template('documentum/services/service.conf.erb'),
- }
  file { 'jms-serviceStartScript':
    ensure    => file,
-   path      => "/etc/init.d/${jms_service}",
+   path      => "/usr/lib/systemd/system/${jms_service}.service",
    owner     => root,
    group     => root,
    mode      => 755,
-   content   => template('documentum/services/service.erb'),
+   content   => template('documentum/content/jms.service.erb'),
+ }
+
+ file { 'dctm-env':
+   ensure    => file,
+   path      => "/etc/default/dctm",
+   owner     => root,
+   group     => root,
+   mode      => 755,
+   content   => template('documentum/content/dctm.erb'),
  }
 
  exec {'chkconfig-jms':
-   require     => [File["jms-serviceConfig"],
-                   File["jms-serviceStartScript"],
+   require     => [File["jms-serviceStartScript"],
+                   File["dctm-env"],
                  ],
-   command  => "/sbin/chkconfig --add ${jms_service}; /sbin/chkconfig ${jms_service} on",
-   onlyif    =>  "/usr/bin/test `/sbin/chkconfig --list | /bin/grep ${jms_service} | /usr/bin/wc -l` -eq 0",
- }
+   command  => "systemctl --system daemon-reload",
+   }
 
 ## now we actually install the software
   exec { "cs-installer":
    command   => "/bin/tar xvf ${source_location}/Repository/${version}/Content_Server_${version}_linux64_oracle.tar",
-   require   => Service["rngd"],
+   require   => [Service["rngd"],
+                File["${documentum}"]],
    cwd       => $installer_location,
    creates   => "${installer_location}/serverSetup.bin",
    user      => $dctm_owner,
@@ -91,45 +92,4 @@ define documentum::contentserver::server(
    timeout     => 1800,
    logoutput   => true,
  }
-
-## copy files across that will be necessary for DCTM services
-
-## TODO   move this somewhere else (possible)
-  file { 'documentum.sh':
-    ensure    => file,
-    require   => [Exec["cs-install"]],
-    path      => "/etc/profile.d/documentum.sh",
-    owner     => root,
-    group     => root,
-    mode      => 755,
-    content   => template('documentum/services/documentum.sh.erb'),
-  }
-
-  file { 'get_pid.sh':
-    ensure    => file,
-    require   => [Exec["cs-install"]],
-    path      => "${documentum}/product/${version}/bin/get_pid",
-    owner     => $dctm_owner,
-    group     => $dctm_group,
-    mode      => 755,
-    content   => template('documentum/services/get_pid.erb'),
-  }
-
-  file { 'daemonize':
-    ensure    => file,
-    path      => "/usr/local/sbin/daemonize",
-    owner     => root,
-    group     => root,
-    mode      => 755,
-    source => 'puppet:///modules/documentum/daemonize';
-  }
-
-  file { 'daemonize.1':
-    ensure    => file,
-    path      => "/usr/local/share/man/man1/daemonize.1",
-    owner     => root,
-    group     => root,
-    mode      => 644,
-    source => 'puppet:///modules/documentum/daemonize.1';
-  }
 }
