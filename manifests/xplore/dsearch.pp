@@ -68,4 +68,11 @@ define documentum::xplore::dsearch(
                 File["dsearch-serviceStartScript"],]
   }
 
+## nasty hack but ensures that dsearch has actually started
+  exec { 'waitingforstart':
+    require => Service["$dsearch_service"],
+    command => "sleep 240 && /run/my/command/to/get/results/from/the/web/service",
+    path => "/usr/bin:/bin",
+  }
+
 }
