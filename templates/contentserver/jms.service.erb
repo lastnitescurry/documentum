@@ -1,0 +1,14 @@
+[Unit]
+Description=MethodServer
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/bin/nohup <%=@documentum%>/shared/wildfly9.0.1/server/startMethodServer.sh &>/dev/null &
+ExecStop=<%=@documentum%>/shared/wildfly9.0.1/server/stopMethodServer.sh
+RemainAfterExit=yes
+EnvironmentFile=/etc/default/dctm
+User=<%=@dctm_owner%>
+
+[Install]
+WantedBy=multi-user.target

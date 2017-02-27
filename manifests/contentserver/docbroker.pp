@@ -3,53 +3,56 @@
 # Adds an Apache configuration file.
 # http://stackoverflow.com/questions/19024134/calling-puppet-defined-resource-with-multiple-parameters-multiple-times
 #
-class documentum::contentserver::docbroker() {
-  $ensure         = file
-  $documentum     = '/u01/app/documentum'
-  $version        = '7.1'
-  $installer      = '/u01/app/documentum/product/7.1/install'
-  $docbroker_port = 1489
-  $docbroker_name = Docbroker
-  $docbroker_host = $hostname
+define documentum::contentserver::docbroker(
+  $installer_location,
+  $documentum,
+  $dctm_owner,
+  $dctm_group,
+  $version,
+  $docbroker_port,
+  $docbroker_host,
 
+  $docbroker_name = $name,
+  $installer      = "${documentum}/product/${version}/install",
+ ) {
   # template(<FILE REFERENCE>, [<ADDITIONAL FILES>, ...])
   file { 'docbroker-response':
     ensure    => file,
-    path      => '/home/dmadmin/sig/docbroker/docbroker.properties',
-    owner     => dmadmin,
-    group     => dmadmin,
-    content   => template('documentum/docbroker.properties.erb'),
+    path      => "${installer_location}/docbroker/docbroker.properties",
+    owner     => $dctm_owner,
+    group     => $dctm_group,
+    content   => template('documentum/contentserver/docbroker.properties.erb'),
   }
-      
+
   exec { "docbroker-create":
-    command     => "${installer}/dm_launch_server_config_program.sh -f /home/dmadmin/sig/docbroker/docbroker.properties -r /home/dmadmin/sig/docbroker/response.properties -i Silent",
+    command     => "${installer}/dm_launch_server_config_program.sh -f ${installer_location}/docbroker/docbroker.properties -r ${installer_location}/docbroker/response.properties -i Silent",
     cwd         => $installer,
     require     => [File["docbroker-response"],
-                    Group["dmadmin"],
-                    User["dmadmin"]],
-    environment => ["HOME=/home/dmadmin",
+                    User["${dctm_owner}"]],
+    environment => ["HOME=/home/${dctm_owner}",
                     "DOCUMENTUM=${documentum}",
                     "DOCUMENTUM_SHARED=${documentum}/shared",
                     "DM_HOME=${documentum}/product/${version}",
-                    "ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe",
-                    "ORACLE_SID=XE",
                     ],
     creates     => "${documentum}/dba/dm_launch_${docbroker_name}",
-    user        => dmadmin,
-    group       => dmadmin,
+    user        => $dctm_owner,
+    group       => $dctm_group,
     logoutput   => true,
-    timeout     => 3000,
-    notify      => [Exec [ "b-install.log"], Exec [ "b-dmadmin.ServerConfigurator.log"]]
+    timeout     => 3000
   }
-  
-  exec { "b-install.log":
-    command     => "/bin/cat ${installer}/logs/install.log",
-    cwd         => $installer,
-    logoutput   => true,
+
+# coppying the service file across
+  file { 'docbroker-service':
+    ensure    => file,
+    path      => "/usr/lib/systemd/system/${docbroker_name}.service",
+    owner     => root,
+    group     => root,
+    mode      => 755,
+    content   => template('documentum/contentserver/docbroker.service.erb'),
   }
-  exec { "b-dmadmin.ServerConfigurator.log":
-    command     => "/bin/cat ${installer}/dmadmin.ServerConfigurator.log",
-    cwd         => $installer,
-    logoutput   => true,
-  }
+  exec {'chkconfig-docbroker':
+    require     => [File["docbroker-service"],
+                  ],
+    command  => "/bin/systemctl --system daemon-reload",
+    }
 }

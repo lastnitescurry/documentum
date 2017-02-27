@@ -1,0 +1,14 @@
+[Unit]
+Description=Repository
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=<%=@documentum%>/dba/dm_start_repo
+ExecStop=<%=@documentum%>/dba/dm_shutdown_repo
+RemainAfterExit=yes
+User=dmadmin
+EnvironmentFile=/etc/default/dctm
+
+[Install]
+WantedBy=multi-user.target

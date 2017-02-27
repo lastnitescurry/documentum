@@ -3,69 +3,82 @@
 # Adds an Apache configuration file.
 # http://stackoverflow.com/questions/19024134/calling-puppet-defined-resource-with-multiple-parameters-multiple-times
 #
-class documentum::contentserver::repository() {
-  $ensure          = 'file'
-  $documentum      = '/u01/app/documentum'
-  $version         = '7.1'
-  $installer       = '/u01/app/documentum/product/7.1/install'
-  $docbroker_port  = '1489'
-  $docbroker_name  = 'Docbroker'
-  $docbroker_host  = $hostname
-  $documentum_data = '/vagrant/repositorydata'
+define documentum::contentserver::repository(
+  $installer_location,
+  $documentum,
+  $dctm_owner,
+  $dctm_group,
+  $version,
+
+  $docbroker_port,
+  $docbroker_name,
+  $docbroker_host,
+
+  $repository_name = $name,
+  $repository_id,
+  $repository_service,
+  $repository_desc,
+  $repository_host,
+  $repository_data_dir,
+  $db_user,
+  $db_password,
+  $db_connection,
+  $db_tablespace,
+  $oracle_home,
+  $bof_registry_password,
+
+  $installer      = "${documentum}/product/${version}/install",
+  ) {
 
   # template(<FILE REFERENCE>, [<ADDITIONAL FILES>, ...])
   file { 'repository-response':
     ensure    => file,
-    path      => '/home/dmadmin/sig/repository/repository.properties',
-    owner     => dmadmin,
-    group     => dmadmin,
-    content   => template('documentum/repository.properties.erb'),
+    path      => "${installer_location}/repository/repository.properties",
+    owner     => $dctm_owner,
+    group     => $dctm_group,
+    content   => template('documentum/contentserver/repository.properties.erb'),
   }
   file { 'repository-data-dir':
     ensure    => directory,
-    path      => $documentum_data,
-    owner     => dmadmin,
-    group     => dmadmin,
+    path      => $repository_data_dir,
+    owner     => $dctm_owner,
+    group     => $dctm_group,
   }
-  
+
   exec { "repository-create":
-    command     => "${installer}/dm_launch_server_config_program.sh -f /home/dmadmin/sig/repository/repository.properties -r /home/dmadmin/sig/repository/response.properties -i Silent",
+    command     => "${installer}/dm_launch_server_config_program.sh -f ${installer_location}/repository/repository.properties -r ${installer_location}/repository/response.properties -i Silent",
     cwd         => $installer,
     require     => [File["repository-response"],
                     File["repository-data-dir"],
-                    Group["dmadmin"],
-                    User["dmadmin"]],
-    environment => ["HOME=/home/dmadmin",
+                    User["${dctm_owner}"],
+                    File["tnsnames"],
+                    Exec["clientInstall"]],
+    environment => ["HOME=/home/${dctm_owner}",
                     "DOCUMENTUM=${documentum}",
                     "DOCUMENTUM_SHARED=${documentum}/shared",
                     "DM_HOME=${documentum}/product/${version}",
-                    "ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe",
-                    "ORACLE_SID=XE",
+                    "ORACLE_HOME=${oracle_home}",
+                    "ORACLE_SID=${db_connection}",
                     ],
-    creates     => "${documentum}/dba/dm_start_farrengold",
-    user        => dmadmin,
-    group       => dmadmin,
+    creates     => "${documentum}/dba/dm_start_${repository_name}",
+    user        => $dctm_owner,
+    group       => $dctm_group,
     logoutput   => true,
     timeout     => 3000,
-    notify      => [File["dfc.properties"], Exec [ "r-install.log"], Exec [ "r-dmadmin.ServerConfigurator.log"]]
   }
-  
-  exec { "r-install.log":
-    command     => "/bin/cat ${installer}/logs/install.log",
-    cwd         => $installer,
-    logoutput   => true,
-  }
-  exec { "r-dmadmin.ServerConfigurator.log":
-    command     => "/bin/cat ${installer}/dmadmin.ServerConfigurator.log",
-    cwd         => $installer,
-    logoutput   => true,
-  }
-  
-  file { 'dfc.properties':
+
+# coppying the service file across
+  file { 'repository-service':
     ensure    => file,
-    path      => '/vagrant/repositorydata/dfc.properties',
-    owner     => dmadmin,
-    group     => dmadmin,
-    source    => '/u01/app/documentum/shared/config/dfc.properties',
+    path      => "/usr/lib/systemd/system/${repository_name}.service",
+    owner     => root,
+    group     => root,
+    mode      => 755,
+    content   => template('documentum/contentserver/repository.service.erb'),
   }
+  exec {'repository-docbroker':
+    require     => [File["repository-service"],
+                  ],
+    command  => "/bin/systemctl --system daemon-reload",
+    }
 }
